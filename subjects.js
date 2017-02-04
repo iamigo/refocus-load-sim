@@ -15,6 +15,18 @@ if (conf.subjects.depth >= 2 && conf.subjects.depth <= 5) {
 const roots = Array.apply(null, { length: conf.subjects.roots })
   .map(Number.call, Number);
 
+function hierarchy(roots) {
+  const afterGet = (res) => {
+    debug('Got hierarchy', res.absolutePath);
+    return res.absolutePath;
+  };
+  const getWithDelay = (r) => delay(conf.delay)
+    .then(() => rc.getHierarchy(r))
+    .then(afterGet);
+  const arr = roots.map(getWithDelay);
+  return eachPromise.serial(arr);
+} // hierarchy
+
 function addRoots() {
   const subjects = roots.map((r) => ({
       name: `${conf.prefix}r${r}`,
@@ -102,4 +114,5 @@ module.exports = {
   addRoots,
   addChildren,
   deleteSubjects,
+  hierarchy,
 };

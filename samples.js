@@ -8,14 +8,7 @@ const rconf = require('./config/refocus');
 const rc = new RefocusClient(rconf.refocusUrl, rconf.apiVersion, rconf.token);
 const rand = new Random();
 
-let roots;
-
-function init(rmap) {
-  // debug(rmap);
-  roots = rmap;
-}
-  
-function upsertSamples() {
+function upsert(roots) {
   const batches = {};
   Object.keys(roots).forEach((r) => {
     batches[r] = [];
@@ -38,6 +31,5 @@ function upsertSamples() {
 } // upsertSamples
 
 module.exports = {
-  init,
-  upsertSamples,
+  upsert,
 };
