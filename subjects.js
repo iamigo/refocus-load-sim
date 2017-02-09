@@ -32,17 +32,12 @@ function addRoots() {
       name: `${conf.prefix}r${r}`,
       isPublished: true,
     }));
-
   debug('Root subjects to add:', subjects.length);
-  const afterAdd = (s) => {
-    debug('Added subject', s.absolutePath);
-    return s;
-  };
-  const addWithDelay = (subj) => delay(conf.delay)
-    .then(() => rc.addRootSubject(subj))
-    .then(afterAdd);
-  const arr = subjects.map(addWithDelay);
-  return eachPromise.serial(arr);
+  return rc.addRootSubjects(subjects)
+  .then((added) => {
+    added.forEach((s) => debug('Added subject', s.absolutePath));
+    return added;
+  });
 } // addRoots
 
 function addChildren() {
@@ -87,27 +82,23 @@ function addChildren() {
   }); // for each root
 
   debug('Subject children to add:', subjects.length);
-  const afterAdd = (s) => {
-    debug('Added subject', s.absolutePath);
-    return s;
-  };
-  const addWithDelay = (subj) => delay(conf.delay)
-    .then(() => rc.addChildSubject(subj.parentName, subj.child)
-      .then(afterAdd));
-  const arr = subjects.map(addWithDelay);
-  return eachPromise.serial(arr);
+  const arr = subjects.map((subj) => ({
+    parentAbsolutePath: subj.parentName,
+    subject: subj.child,
+  }));
+  return rc.addChildSubjects(arr)
+  .then((added) => {
+    added.forEach((s) => debug('Added subject', s.absolutePath));
+    return added;
+  });
 } // addChildren
 
 function deleteSubjects(subjects) {
-  const afterDelete = (s) => {
-    debug('Deleted subject', s.absolutePath);
-    return s;
-  };
-  const deleteWithDelay = (subj) => delay(conf.delay)
-    .then(() => rc.deleteSubject(subj))
-    .then(afterDelete);
-  const arr = subjects.map(deleteWithDelay);
-  return eachPromise.serial(arr);
+  return rc.deleteSubjects(subjects)
+  .then((deleted) => {
+    deleted.forEach((s) => debug('Deleted subject', s.absolutePath));
+    return deleted;
+  });
 } // deleteSubjects
 
 module.exports = {

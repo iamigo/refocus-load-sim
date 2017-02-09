@@ -16,14 +16,17 @@ function teardownSubjects(rootMap) {
 
   // Prepare the list of subjects to delete.
   const arr = [];
+  const roots = [];
   Object.keys(rootMap).forEach((r) => {
     rootMap[r].subjects.forEach((s) => arr.push(s));
-    arr.push(r);
+    roots.push(r);
   });
 
   arr.sort().reverse(); // delete children before parents!
   return subjects.deleteSubjects(arr)
-  .then(() => debug('Finished tearing down subjects.'));
+  .then(() => debug('Finished tearing down children.'))
+  .then(() => subjects.deleteSubjects(roots))
+  .then(() => debug('Finished tearing down root subjects.'))
 } // teardownSubjects
 
 /**
